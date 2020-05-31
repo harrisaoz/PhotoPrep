@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Configuration;
 using System.Data;
 using System.Diagnostics;
 using System.Drawing;
@@ -18,11 +19,9 @@ namespace PhotoPrep
         public ImportForm()
         {
             InitializeComponent();
-        }
 
-        private void Form1_Load(object sender, EventArgs e)
-        {
-
+            this.fromDirName.Text = Properties.Settings.Default.SourceFolderName;
+            this.toDirName.Text = Properties.Settings.Default.TargetFolderName;
         }
 
         private void chooseFromDir_Click(object sender, EventArgs e)
@@ -30,13 +29,15 @@ namespace PhotoPrep
             FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog
             {
                 RootFolder = Environment.SpecialFolder.MyComputer,
+                SelectedPath = Properties.Settings.Default.SourceFolderName,
                 ShowNewFolderButton = false
             };
             DialogResult folderSelectionResult = folderBrowserDialog.ShowDialog();
 
             if (folderSelectionResult.Equals(DialogResult.OK))
             {
-                this.fromDirName.Text = folderBrowserDialog.SelectedPath;
+                Properties.Settings.Default.SourceFolderName = this.fromDirName.Text = folderBrowserDialog.SelectedPath;
+                Properties.Settings.Default.Save();
                 setActionButtonState();
             }
         }
@@ -46,14 +47,15 @@ namespace PhotoPrep
             FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog
             {
                 RootFolder = Environment.SpecialFolder.MyComputer,
-                SelectedPath = "o:\\",
+                SelectedPath = Properties.Settings.Default.TargetFolderName,
                 ShowNewFolderButton = true
             };
             DialogResult folderSelectionResult = folderBrowserDialog.ShowDialog();
 
             if (folderSelectionResult.Equals(DialogResult.OK))
             {
-                this.toDirName.Text = folderBrowserDialog.SelectedPath;
+                Properties.Settings.Default.TargetFolderName = this.toDirName.Text = folderBrowserDialog.SelectedPath;
+                Properties.Settings.Default.Save();
                 setActionButtonState();
             }
         }

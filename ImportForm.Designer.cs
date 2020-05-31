@@ -194,7 +194,6 @@
             this.Controls.Add(this.chooseFromDir);
             this.Name = "ImportForm";
             this.Text = "Import Photos and Videos";
-            this.Load += new System.EventHandler(this.Form1_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 

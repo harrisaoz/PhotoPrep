@@ -41,7 +41,7 @@
             this.topInfoPanel.Dock = System.Windows.Forms.DockStyle.Top;
             this.topInfoPanel.Location = new System.Drawing.Point(0, 0);
             this.topInfoPanel.Name = "topInfoPanel";
-            this.topInfoPanel.Size = new System.Drawing.Size(800, 100);
+            this.topInfoPanel.Size = new System.Drawing.Size(984, 100);
             this.topInfoPanel.TabIndex = 0;
             // 
             // importProgress
@@ -49,7 +49,7 @@
             this.importProgress.Dock = System.Windows.Forms.DockStyle.Top;
             this.importProgress.Location = new System.Drawing.Point(0, 0);
             this.importProgress.Name = "importProgress";
-            this.importProgress.Size = new System.Drawing.Size(800, 23);
+            this.importProgress.Size = new System.Drawing.Size(984, 23);
             this.importProgress.TabIndex = 0;
             // 
             // importLog
@@ -63,7 +63,7 @@
             this.importLog.Name = "importLog";
             this.importLog.ReadOnly = true;
             this.importLog.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.importLog.Size = new System.Drawing.Size(800, 350);
+            this.importLog.Size = new System.Drawing.Size(984, 350);
             this.importLog.TabIndex = 1;
             this.importLog.Text = "Import Log:\r\n";
             // 
@@ -72,7 +72,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoScroll = true;
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.ClientSize = new System.Drawing.Size(984, 450);
             this.Controls.Add(this.importLog);
             this.Controls.Add(this.topInfoPanel);
             this.Name = "ImportRunner";
