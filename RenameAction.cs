@@ -12,7 +12,7 @@ namespace PhotoPrep
 
     public class RenameAction
     {
-        public static IEnumerable<(string, FileInfo)> SimulateRequestedRenames(
+        public static IEnumerable<Func<ValueTuple<string, FileInfo>>> SimulateRequestedRenames(
             DirectoryInfo parentDir,
             IEnumerable<(FileInfo, string, bool)> renameRequests
         )
@@ -24,7 +24,7 @@ namespace PhotoPrep
             );
         }
 
-        public static IEnumerable<(string, FileInfo)> PerformRequestedRenames(
+        public static IEnumerable<Func<ValueTuple<string, FileInfo>>> PerformRequestedRenames(
             DirectoryInfo parentDir,
             IEnumerable<(FileInfo, string, bool)> renameRequests
         )
@@ -36,7 +36,7 @@ namespace PhotoPrep
             );
         }
 
-        public static IEnumerable<(string, FileInfo)> MaybePerformRequestedRenames(
+        public static IEnumerable<Func<ValueTuple<string, FileInfo>>> MaybePerformRequestedRenames(
             DirectoryInfo parentDir,
             IEnumerable<(FileInfo, string, bool)> renameRequests,
             bool simulateOnly = true
@@ -44,32 +44,35 @@ namespace PhotoPrep
         {
             return renameRequests
                 .Where(req => req.Item3)
-                .Select(PerformRequestedRename(
-                    simulateOnly: simulateOnly));
+                .Select(req => (req.Item1, req.Item2))
+                .Select(GetRenameAction(simulateOnly: simulateOnly));
         }
 
-        static Func<(FileInfo, string, bool), (string, FileInfo)> PerformRequestedRename(
+        static Func<(FileInfo, string), Func<ValueTuple<string, FileInfo>>> GetRenameAction(
             bool simulateOnly = true
         )
         {
             return req =>
             {
-                var (original, newName, shouldRename) = req;
+                var (original, newName) = req;
                 var newFullName = Path.Combine(original.DirectoryName, newName);
 
-                if (!simulateOnly)
+                return () =>
                 {
-                    original.MoveTo(newFullName);
-                }
+                    if (!simulateOnly)
+                    {
+                        original.MoveTo(newFullName);
+                    }
 
-                var msg = simulateOnly
-                    ? "[Simulation] In [{0}] Move {1} -> {2}"
-                    : "In [{0}] Moved {1} -> {2}";
+                    var msg = simulateOnly
+                        ? "[Simulation] In [{0}] Move {1} -> {2}"
+                        : "In [{0}] Moved {1} -> {2}";
 
-                return (
-                    string.Format(msg, original.DirectoryName, original.Name, newName),
-                    new FileInfo(newFullName)
-                );
+                    return (
+                        string.Format(msg, original.DirectoryName, original.Name, newName),
+                        new FileInfo(newFullName)
+                    );
+                };
             };
         }
 

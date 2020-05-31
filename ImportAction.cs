@@ -22,7 +22,7 @@ namespace PhotoPrep
             return grouped.SelectMany(group => group.AsEnumerable());
         }
 
-        public static IEnumerable<(string, FileInfo)> SimulateRequestedFileCopies(
+        public static IEnumerable<Func<(string, FileInfo)>> SimulateRequestedFileCopies(
             DirectoryInfo dstDir,
             IEnumerable<GroupedCopyRequest> requests)
         {
@@ -33,7 +33,7 @@ namespace PhotoPrep
             );
         }
         
-        public static IEnumerable<(string, FileInfo)> PerformRequestedFileCopies(
+        public static IEnumerable<Func<(string, FileInfo)>> PerformRequestedFileCopies(
             DirectoryInfo dstDir,
             IEnumerable<GroupedCopyRequest> requests)
         {
@@ -44,7 +44,7 @@ namespace PhotoPrep
             );
         }
 
-        public static IEnumerable<(string, FileInfo)> MaybePerformRequestedFileCopies(
+        public static IEnumerable<Func<(string, FileInfo)>> MaybePerformRequestedFileCopies(
             DirectoryInfo dstDir,
             IEnumerable<GroupedCopyRequest> requests,
             bool simulateOnly = true)
@@ -54,18 +54,13 @@ namespace PhotoPrep
                 .SelectMany(group => group.AsEnumerable())
                 .Select(PerformRequestedFileCopy(simulateOnly: simulateOnly));
 
-            var msg = simulateOnly
-                        ? "Simulated processing of {0} file copy requests"
-                        : "Satisfied {0} file copy requests";
-
-            Console.WriteLine(msg, actions.Count());
-
             return actions;
         }
 
-        public static Func<CopyRequest, (string, FileInfo)> PerformRequestedFileCopy(bool simulateOnly = true)
+        public static Func<CopyRequest, Func<(string, FileInfo)>> PerformRequestedFileCopy(
+            bool simulateOnly = true)
         {
-            return request =>
+            return request => () =>
             {
                 var (original, dstFullName) = request;
 

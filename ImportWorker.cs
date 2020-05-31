@@ -6,10 +6,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Diagnostics.Contracts;
 
 namespace PhotoPrep
 {
-    using ActionItem = ValueTuple<string, FileInfo>;
+    using ActionItem = Func<ValueTuple<string, FileInfo>>;
 
     public class ImportWorker
     {
@@ -35,6 +36,7 @@ namespace PhotoPrep
             this.infoBox = infoBox;
             this.progressBar = progressBar;
 
+            Contract.Requires(worker != null);
             this.worker = worker;
             this.worker.WorkerReportsProgress = true;
             this.worker.DoWork += new System.ComponentModel.DoWorkEventHandler(
@@ -63,15 +65,15 @@ namespace PhotoPrep
         {
             BackgroundWorker localWorker = sender as BackgroundWorker;
 
-            IEnumerator<ActionItem> enumerator = (IEnumerator<ActionItem>) eventArgs.Argument;
+            IEnumerator<ActionItem> enumerator = (IEnumerator<ActionItem>)eventArgs.Argument;
 
-            eventArgs.Result = SimulateAction(enumerator, localWorker, eventArgs);
+            eventArgs.Result = PerformAction(enumerator, localWorker, eventArgs);
         }
 
         void OnProgress(object sender, ProgressChangedEventArgs eventArgs)
         {
             this.progressBar.Value = eventArgs.ProgressPercentage;
-            var msg = (string) eventArgs.UserState;
+            var msg = (string)eventArgs.UserState;
 
             logInfo(msg);
         }
@@ -79,30 +81,32 @@ namespace PhotoPrep
         void OnComplete(object sender, RunWorkerCompletedEventArgs eventArgs)
         {
             this.progressBar.Value = 100;
-            logInfo(string.Format(
+            _ = logInfo(string.Format(
                 "Complete - {0} action{1} processed",
                 this.workItemsComplete,
                 this.workItemsComplete == 1 ? "" : "s"
             ));
         }
 
-        private int SimulateAction(
+        private int PerformAction(
             IEnumerator<ActionItem> enumerator,
             BackgroundWorker localWorker,
             DoWorkEventArgs args
         )
         {
-            var (msg, _) = enumerator.Current;
-            int percentComplete = this.workItemsComplete * 100 / this.totalWorkItems;
-            localWorker.ReportProgress(percentProgress: percentComplete, msg);
-
-            if (enumerator.MoveNext())
+            while (enumerator.MoveNext())
             {
-                this.workItemsComplete++;
+                var action = enumerator.Current;
+                if (action != null)
+                {
+                    var (msg, newFile) = action();
+                    this.workItemsComplete++;
 
-                SimulateAction(enumerator, worker, args);
+                    localWorker.ReportProgress(
+                        percentProgress: this.workItemsComplete * 100 / this.totalWorkItems,
+                        msg);
+                }
             }
-
             return this.workItemsComplete;
         }
     }
