@@ -89,7 +89,7 @@ namespace PhotoPrep
 
             var fileRenames = RenameAction.GetNewNames(
                 sourceDir: fromDir,
-                fileExtensionFilter: new[] { "jpg", "jpeg", "heic", "heif", "mov", "mp4" },
+                fileExtensionFilter: new[] { "jpg", "jpeg", "heic", "heif", "mov", "mp4", "nef" },
                 shouldUseDateWritten: shouldUseDateWritten.Checked,
                 shouldIncludeSerialNumber: true,
                 prefixToRemove: prefixToRemove.Text,
